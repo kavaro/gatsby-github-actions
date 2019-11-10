@@ -1,5 +1,5 @@
 name: publish
-on: [repository_dispatch]
+on: [repository_dispatch, publish]
 jobs:
   publish:
     name: install, build and publish
