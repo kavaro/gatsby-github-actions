@@ -1,7 +1,7 @@
 name:  publish website
 on: [repository_dispatch]
 jobs:
-  publish:
+  publish_website:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
