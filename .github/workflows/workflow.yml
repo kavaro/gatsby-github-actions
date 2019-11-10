@@ -1,8 +1,7 @@
-name: publish
-on: [repository_dispatch, publish]
+name:  publish website
+on: [repository_dispatch]
 jobs:
   publish:
-    name: install, build and publish
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
