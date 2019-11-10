@@ -1,7 +1,7 @@
 name: publish
 on: [repository_dispatch]
 jobs:
-  build:
+  publish:
     name: install, build and publish
     runs-on: ubuntu-latest
     steps:
