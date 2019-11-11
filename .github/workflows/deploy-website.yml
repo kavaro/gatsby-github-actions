@@ -3,7 +3,7 @@ name: Deploy website
 on: [repository_dispatch]
 
 jobs:
-  build:
+  deploy-website:
 
     runs-on: ubuntu-latest
 
