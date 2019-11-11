@@ -22,7 +22,6 @@
     "react-helmet": "^5.2.1"
   },
   "devDependencies": {
-    "firebase-tools": "^7.7.0",
     "gatsby-cli": "^2.8.8",
     "prettier": "^1.18.2"
   },
@@ -30,7 +29,7 @@
   "scripts": {
     "build": "node_modules/.bin/gatsby build",
     "develop": "node_modules/.bin/gatsby develop",
-    "publish": "node_modules/.bin/firebase deploy",
+    "publish": "firebase deploy",
     "trigger-publish": "./trigger-publish.sh",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "yarn develop",
