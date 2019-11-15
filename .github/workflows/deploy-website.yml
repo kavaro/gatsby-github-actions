@@ -12,11 +12,40 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
-      - run: yarn install
-      - run: yarn build
+      - name: Configure git
+        run: |
+          git config --local user.email "karl.van.rompaey@hotmail.com"
+          git config --local user.name "kavaro"          
+      - name: Create release branch
+        run: git checkout -b ${{ github.event.client_payload.branch }}
+      - name: Install project dependencies
+        run: yarn install
+      - name: Update database
+        run: | 
+          rm -rf db
+          mkdir -p db/properties
+          echo "{}" > db/properties/a.json
+          echo "{}" > db/properties/b.json
+      - name: Build website
+        run: yarn build
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
           args: deploy
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      - name: "Commit and tag release"
+        run: | 
+          git add db
+          git commit -m "${{ github.event.client_payload.commit_msg }}"
+          git tag -a "${{ github.event.client_payload.tag }}" -m "${{ github.event.client_payload.tag_msg }}"
+      - name: Push release branch
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.event.client_payload.branch }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push release tag
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.event.client_payload.tag }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
