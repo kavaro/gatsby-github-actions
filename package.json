@@ -30,7 +30,7 @@
     "build": "node_modules/.bin/gatsby build",
     "develop": "node_modules/.bin/gatsby develop",
     "publish": "firebase deploy",
-    "trigger-publish": "./trigger-publish.sh",
+    "deploy-website": "./deploy-website.sh",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "yarn develop",
     "serve": "node_modules/.bin/gatsby serve",
