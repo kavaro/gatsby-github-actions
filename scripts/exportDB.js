@@ -10,7 +10,7 @@ if (process.argv.length < 4) {
   process.exit(1)
 }
 
-const credential = firebase.credential.cert(JSON.parse(process.argv[2]))
+const credential = firebase.credential.cert(JSON.parse(Buffer.from(process.argv[2], 'base64').toString('utf8')))
 const databaseURL = process.argv[3]
 firebase.initializeApp({ credential, databaseURL })
 
