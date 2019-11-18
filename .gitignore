@@ -1,7 +1,7 @@
 # db snapshot
 db/collections.json
 
-# firebase cache
+# firebase/hosting cache
 .firebase
 
 # Logs
