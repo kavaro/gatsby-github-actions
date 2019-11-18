@@ -8,7 +8,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v1
+        with:
+          ref: ${{ github.event.client_payload.source }}
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
@@ -19,11 +21,28 @@ jobs:
           git config --local user.name "kavaro"          
           git checkout -b ${{ github.event.client_payload.branch }}
           yarn install
-      - name: Build
+      - name: Commit database
         if: success()
         run: |
           node scripts/exportDB "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" "${{ secrets.FIREBASE_DATABASE_URL }}"
-          yarn build
+          git add db -A
+          git diff-index --quiet HEAD || git commit -m "${{ github.event.client_payload.commit_msg }}"
+          git tag -a "${{ github.event.client_payload.tag }}" -m "${{ github.event.client_payload.tag_msg }}"
+      - name: Push database branch
+        if: success()
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.event.client_payload.branch }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push database tag
+        if: success()
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.event.client_payload.tag }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build
+        if: success()
+        run: yarn build
       - name: Deploy
         if: success()
         uses: w9jds/firebase-action@master
@@ -31,21 +50,3 @@ jobs:
           args: deploy
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-      - name: "Commit"
-        if: success()
-        run: | 
-          git add db -A
-          git diff-index --quiet HEAD || git commit -m "${{ github.event.client_payload.commit_msg }}"
-          git tag -a "${{ github.event.client_payload.tag }}" -m "${{ github.event.client_payload.tag_msg }}"
-      - name: Push release branch
-        if: success()
-        uses: ad-m/github-push-action@master
-        with:
-          branch: ${{ github.event.client_payload.branch }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push release tag
-        if: success()
-        uses: ad-m/github-push-action@master
-        with:
-          branch: ${{ github.event.client_payload.tag }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
