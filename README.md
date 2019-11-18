@@ -1,3 +1,7 @@
+Idea:
+- use octokit to commit database files to github
+- then trigger 
+
 How to setup deploy-website github actions
 1. create repository
 2. create or re-use existing personal access token (required for triggering the deploy-website workflow)
@@ -27,23 +31,23 @@ How to setup deploy-website github actions
 git as database (prefered)
 --------------------------
 - admin:
-  - take JSON snapshot of database and deflate with https://github.com/nodeca/pako
-  - upload JSON to firebase storage
-  - create firestore publish document with reference to firebase storage ref
-  - foreach firestore publish doc older then 1 year 
-    - remove doc from firestore
-- firebase function triggered when publish document is created
-  - trigger github build passing the ref path of the file uploaded to firebase storage
-- firebase function triggered when publish document is removed
-  - remove doc.snapshot from firebase storage
-- github
-  - download and deflate firebase storage snapshot
+  - create firestore deployments document with 
+    - branch: string
+    - commit_msg: string
+    - tag: string
+    - tag_msg: string
+  - firebase function triggered by "deployments document created" event
+    - trigger github action with client_payload = deployment document
+- github:
+  - get firestore deployment document
+    - update status = 'Cloning database'
+  - get all documents from firestore and save as json files
+  - update status = 'buiding'
   - yarn build (gatsby sources db directory)
   - git config --local user.email "karl.van.rompaey@hotmail.com"
   - git config --local user.name "kavaro"
   - git checkout -b ${{ github.event.client_payload.branch }}
   - save snapshot json collections/documents into directories/files under db directory
-  - remove snapshot json file
   - remove all db directories/files that are not in snapshot
   - git add .
   - git commit -m "${{ github.event.client_payload.commit_msg }}"
@@ -51,18 +55,38 @@ git as database (prefered)
   - git push origin ${{ github.event.client_payload.branch }}
   - git push origin ${{ github.event.client_payload.tag }}
 
-firebase storage with snapshots
--------------------------------
+- Client
+  Create snapshot
+  Create firestore doc with status = 'uploading'
+  Upload snapshot of database to storage under firestore snapshots/docId
+    Once the upload has been performed, the user can continue to work while the release is deployed in the background
+  Update firestore deploy doc status = 'uploaded'
+- Firebase function on firestore deploy doc create and update events
+        start github deploy_website workflow
 
-- client adds release document to firestore
-  - firebase function 
-    - uploads json with all database documents to firebase storage
-    - triggers github action passing the url of the uploaded database json
-  - github actions
-    - downloads the json from firebase storage 
-    - adds url to firebase storage to 
-
-
+- Github deploy_website workflow
+  - Update firestore deploy doc status = 'building'
+  - read firestore deploy collection
+  - create branch
+  - download snapshot with docId
+  - gatsby build
+  - commit
+  - tag
+  - Update firestore deploy doc status = 'build'
+  - acquire deploy mutex
+  - if (deploy mutex is acquired)
+      while (most recent deploy doc has status === 'build')
+        try {
+          doc.status = 'deploying'
+          checkout correct branch
+          deploy
+          doc.status = 'deployed'
+        } catch(err) {
+          doc.status = 'error'
+          doc.error = err
+        } finally {
+          release deploy mutex
+        }
 
 
 

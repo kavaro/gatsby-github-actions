@@ -1,3 +1,6 @@
+# db snapshot
+db/collections.json
+
 # Logs
 logs
 *.log
