@@ -34,8 +34,8 @@ jobs:
       - name: "Commit"
         if: success()
         run: | 
-          git add db
-          git commit -m "${{ github.event.client_payload.commit_msg }}"
+          git add db -A
+          git diff-index --quiet HEAD || git commit -m "${{ github.event.client_payload.commit_msg }}"
           git tag -a "${{ github.event.client_payload.tag }}" -m "${{ github.event.client_payload.tag_msg }}"
       - name: Push release branch
         if: success()
