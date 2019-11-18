@@ -6,6 +6,7 @@ const { firestoreExport } = require('node-firestore-import-export')
 const firebase = require('firebase-admin')
 
 if (process.argv.length !== 4) {
+  console.log(`error: exportDB requires 2 arguments, found ${process.argv.length}`)
   console.log('Usage: node exportDB.js accountKey databaseURL')
   process.exit(1)
 }
