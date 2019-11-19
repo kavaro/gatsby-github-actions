@@ -19,13 +19,13 @@ jobs:
         run: |
           git config user.email "${{ github.event.client_payload.user_email }}"
           git config user.name "${{ github.event.client_payload.user_name }}"
-          git checkout -b ${{ github.event.client_payload.dst_branch }}
+          git checkout -b "${{ github.event.client_payload.dst_branch }}"
           yarn install
-          yarn global add firebase-tools@latest
+          yarn global add "firebase-tools@latest"
           node scripts/exportDB "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" "${{ secrets.FIREBASE_DATABASE_URL }}"
           git add db
           git diff-index --quiet HEAD || git commit -m "${{ github.event.client_payload.commit_msg }}"
           git tag -a "${{ github.event.client_payload.tag }}" -m "${{ github.event.client_payload.tag_msg }}"
           git push "https://${{ github.event.client_payload.user_name }}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${{ github.event.client_payload.dst_branch }} --follow-tags
           yarn build
-          firebase deploy --token ${{ secrets.FIREBASE_TOKEN }} --only hosting --non-interactive
+          firebase deploy --token "${{ secrets.FIREBASE_TOKEN }}" --only hosting --non-interactive
