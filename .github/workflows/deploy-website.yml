@@ -14,28 +14,16 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
-      - name: Install
+      - name: Deploy website
         if: success()
         run: |
-          git config --local user.email "karl.van.rompaey@hotmail.com"
-          git config --local user.name "kavaro"          
           git checkout -b ${{ github.event.client_payload.dst_branch }}
           yarn install
-      - name: Commit database
-        if: success()
-        run: |
           node scripts/exportDB "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" "${{ secrets.FIREBASE_DATABASE_URL }}"
-          git add db -A
+          git add db
           git diff-index --quiet HEAD || git commit -m "${{ github.event.client_payload.commit_msg }}"
           git tag -a "${{ github.event.client_payload.tag }}" -m "${{ github.event.client_payload.tag_msg }}"
           git push "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:${{ github.event.client_payload.dst_branch }} --follow-tags
-      - name: Build
-        if: success()
-        run: yarn build
-      - name: Deploy
-        if: success()
-        uses: w9jds/firebase-action@master
-        with:
-          args: deploy
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          yarn build
+          yarn global add firebase-tools
+          firebase deploy --token ${{ secrets.FIREBASE_TOKEN }} --only hosting --non-interactive
