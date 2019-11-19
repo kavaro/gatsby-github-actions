@@ -17,6 +17,8 @@ jobs:
       - name: Deploy website
         if: success()
         run: |
+          git config user.email "${{ github.event.client_payload.user_email }}"
+          git config user.name "${{ github.event.client_payload.user_name }}"
           git checkout -b ${{ github.event.client_payload.dst_branch }}
           yarn install
           yarn global add firebase-tools@latest
