@@ -6,17 +6,17 @@ jobs:
   deploy-website:
 
     env: 
-      INPUT_USER_NAME:${{ github.event.client_payload.user_name }}
-      INPUT_USER_EMAIL:${{ github.event.client_payload.user_email }}
-      INPUT_SRC_BRANCH:${{ github.event.client_payload.src_branch }}
-      INPUT_DST_BRANCH:${{ github.event.client_payload.dst_branch }}
-      INPUT_COMMIT_MSG:${{ github.event.client_payload.commit_msg }}
-      INPUT_TAG:${{ github.event.client_payload.tag }}
-      INPUT_TAG_MSG:${{ github.event.client_payload.tag_msg }}
-      SECRET_GITHUB_TOKEN:${{ secrets.GITHUB_TOKEN }}
-      SECRET_FIREBASE_SERVICE_ACCOUNT:${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      SECRET_FIREBASE_DATABASE_URL:${{ secrets.FIREBASE_DATABASE_URL }}
-      SECRET_FIREBASE_TOKEN:${{ secrets.FIREBASE_TOKEN }}
+      INPUT_USER_NAME: ${{ github.event.client_payload.user_name }}
+      INPUT_USER_EMAIL: ${{ github.event.client_payload.user_email }}
+      INPUT_SRC_BRANCH: ${{ github.event.client_payload.src_branch }}
+      INPUT_DST_BRANCH: ${{ github.event.client_payload.dst_branch }}
+      INPUT_COMMIT_MSG: ${{ github.event.client_payload.commit_msg }}
+      INPUT_TAG: ${{ github.event.client_payload.tag }}
+      INPUT_TAG_MSG: ${{ github.event.client_payload.tag_msg }}
+      SECRET_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SECRET_FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SECRET_FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+      SECRET_FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
     runs-on: ubuntu-latest
 
