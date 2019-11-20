@@ -31,14 +31,14 @@ jobs:
         if: success()
         run: |
           git checkout -b "${INPUT_DST_BRANCH}"
-          git config --global user.email "${INPUT_USER_EMAIL}"
-          git config --global user.name "${INPUT_USER_NAME}"
           yarn install
           yarn global add firebase-tools@latest
           node scripts/exportDB "${SECRET_FIREBASE_SERVICE_ACCOUNT}" "${SECRET_FIREBASE_DATABASE_URL}"
           git add db
           git diff-index --quiet HEAD || git commit -m "${INPUT_COMMIT_MSG}"
           git tag -a "${INPUT_TAG}" -m "${INPUT_TAG_MSG}"
-          git push "https://${INPUT_USER_NAME}:${SECRET_GITHUB_TOKEN}@github.com/gatsby-github-actions.git" HEAD:${INPUT_DST_BRANCH} --follow-tags
+          REMOTE_REPO="https://${GITHUB_ACTOR}:${SECRET_GITHUB_TOKEN}@github.com/${REPOSITORY}.git"
+          echo ${REMOTE_REPO}
+          git push "${REMOTE_REPO}" HEAD:${INPUT_DST_BRANCH} --follow-tags
           yarn build
           firebase deploy --token "${SECRET_FIREBASE_TOKEN}" --only hosting --non-interactive
