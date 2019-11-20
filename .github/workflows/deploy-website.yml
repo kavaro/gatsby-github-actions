@@ -5,6 +5,19 @@ on: [repository_dispatch]
 jobs:
   deploy-website:
 
+    env: 
+      INPUT_USER_NAME:${{ github.event.client_payload.user_name }}
+      INPUT_USER_EMAIL:${{ github.event.client_payload.user_email }}
+      INPUT_SRC_BRANCH:${{ github.event.client_payload.src_branch }}
+      INPUT_DST_BRANCH:${{ github.event.client_payload.dst_branch }}
+      INPUT_COMMIT_MSG:${{ github.event.client_payload.commit_msg }}
+      INPUT_TAG:${{ github.event.client_payload.tag }}
+      INPUT_TAG_MSG:${{ github.event.client_payload.tag_msg }}
+      SECRET_GITHUB_TOKEN:${{ secrets.GITHUB_TOKEN }}
+      SECRET_FIREBASE_SERVICE_ACCOUNT:${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      SECRET_FIREBASE_DATABASE_URL:${{ secrets.FIREBASE_DATABASE_URL }}
+      SECRET_FIREBASE_TOKEN:${{ secrets.FIREBASE_TOKEN }}
+
     runs-on: ubuntu-latest
 
     steps:
@@ -17,15 +30,15 @@ jobs:
       - name: Deploy website
         if: success()
         run: |
-          git config --local user.email "karl.van.rompaey@hotmail.com"
-          git config --local user.name "kavaro"
-          git checkout -b "${{ github.event.client_payload.dst_branch }}"
+          git config --local user.email "${INPUT_USER_EMAIL}"
+          git config --local user.name "${INPUT_USER_NAME}"
+          git checkout -b "${INPUT_DST_BRANCH}"
           yarn install
           yarn global add firebase-tools@latest
-          node scripts/exportDB "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" "${{ secrets.FIREBASE_DATABASE_URL }}"
+          node scripts/exportDB "${SECRET_FIREBASE_SERVICE_ACCOUNT}" "${SECRET_FIREBASE_DATABASE_URL}"
           git add db
-          git diff-index --quiet HEAD || git commit -m "${{ github.event.client_payload.commit_msg }}"
-          git tag -a "${{ github.event.client_payload.tag }}" -m "${{ github.event.client_payload.tag_msg }}"
-          git push "https://${{ github.event.client_payload.user_name }}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${{ github.event.client_payload.dst_branch }}" --follow-tags
+          git diff-index --quiet HEAD || git commit -m "${INPUT_COMMIT_MSG}"
+          git tag -a "${INPUT_TAG}" -m "${INPUT_TAG_MSG}"
+          git push "https://${INPUT_USER_NAME}:${SECRET_GITHUB_TOKEN}@github.com/gatsby-github-actions.git" HEAD:${INPUT_DST_BRANCH} --follow-tags
           yarn build
-          firebase deploy --token "${{ secrets.FIREBASE_TOKEN }}" --only hosting --non-interactive
+          firebase deploy --token "${SECRET_FIREBASE_TOKEN}" --only hosting --non-interactive
