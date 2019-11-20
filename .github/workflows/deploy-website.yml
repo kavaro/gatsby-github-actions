@@ -22,11 +22,9 @@ jobs:
       - uses: actions/checkout@v1
         with:
           ref: ${{ github.event.client_payload.src_branch }}
-          
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
-
       - name: Build
         if: success()
         run: |
@@ -37,18 +35,16 @@ jobs:
           git diff-index --quiet HEAD || git commit -m "${INPUT_COMMIT_MSG}"
           git tag -a "${INPUT_TAG}" -m "${INPUT_TAG_MSG}"
           yarn build
-
-      - name: Backup
-        if: success()
-        uses: ad-m/github-push-action@master
+      - name: Save
+        if: success()
+        uses: ad-m/github-push-action@master
         with:
-          branch: ${{ github.event.client_payload.tag }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish
-        if: success()
-        uses: w9jds/firebase-action@master
+          branch: ${{ github.event.client_payload.tag }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish
+        if: success()
+        uses: w9jds/firebase-action@master
         with:
-          args: deploy
+          args: deploy
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
