@@ -27,18 +27,26 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
-      - name: Deploy website
+      - name: Build
         if: success()
         run: |
           git checkout -b "${INPUT_DST_BRANCH}"
           yarn install
-          yarn global add firebase-tools@latest
           node scripts/exportDB "${SECRET_FIREBASE_SERVICE_ACCOUNT}" "${SECRET_FIREBASE_DATABASE_URL}"
           git add db
           git diff-index --quiet HEAD || git commit -m "${INPUT_COMMIT_MSG}"
           git tag -a "${INPUT_TAG}" -m "${INPUT_TAG_MSG}"
-          REMOTE_REPO="https://${GITHUB_ACTOR}:${SECRET_GITHUB_TOKEN}@github.com/${REPOSITORY}.git"
-          echo ${REMOTE_REPO}
-          git push "${REMOTE_REPO}" HEAD:${INPUT_DST_BRANCH} --follow-tags
           yarn build
-          firebase deploy --token "${SECRET_FIREBASE_TOKEN}" --only hosting --non-interactive
+      - name: Backup
+        if: success()
+        uses: ad-m/github-push-action@master
+        with:
+          branch: ${{ github.event.client_payload.tag }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish
+        if: success()
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
