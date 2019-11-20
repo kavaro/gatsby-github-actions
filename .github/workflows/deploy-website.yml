@@ -30,8 +30,8 @@ jobs:
       - name: Deploy website
         if: success()
         run: |
-          # git config --local user.email "${INPUT_USER_EMAIL}"
-          # git config --local user.name "${INPUT_USER_NAME}"
+          git config user.email "${INPUT_USER_EMAIL}"
+          git config user.name "${INPUT_USER_NAME}"
           git checkout -b "${INPUT_DST_BRANCH}"
           yarn install
           yarn global add firebase-tools@latest
