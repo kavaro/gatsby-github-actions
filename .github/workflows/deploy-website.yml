@@ -30,9 +30,9 @@ jobs:
       - name: Deploy website
         if: success()
         run: |
-          git config user.email "${INPUT_USER_EMAIL}"
-          git config user.name "${INPUT_USER_NAME}"
           git checkout -b "${INPUT_DST_BRANCH}"
+          git config --global user.email "${INPUT_USER_EMAIL}"
+          git config --global user.name "${INPUT_USER_NAME}"
           yarn install
           yarn global add firebase-tools@latest
           node scripts/exportDB "${SECRET_FIREBASE_SERVICE_ACCOUNT}" "${SECRET_FIREBASE_DATABASE_URL}"
