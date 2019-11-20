@@ -28,6 +28,8 @@ jobs:
       - name: Build
         if: success()
         run: |
+          git config --global user.email "karl.van.rompaey@hotmail.com"
+          git config --global user.name "kavaro"
           git checkout -b "${INPUT_DST_BRANCH}"
           yarn install
           node scripts/exportDB "${SECRET_FIREBASE_SERVICE_ACCOUNT}" "${SECRET_FIREBASE_DATABASE_URL}"
